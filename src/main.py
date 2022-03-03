@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Contact
 #from models import Person
 
 app = Flask(__name__)
@@ -38,6 +38,86 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
+@app.route('/contact', methods=['GET'])
+def get_contact():
+
+    contacts = Contact.query.all()
+    results = list(map(lambda item: item.serialize(),contacts))
+
+    response_body = {
+        "msg": "Hello, this is your GET /user response ",
+        "contacts": results
+    }
+
+    return jsonify(response_body), 200
+
+
+@app.route('/contact', methods=['POST'])
+def post_contact():
+    body = request.get_json()
+    newContact = Contact(full_name= body["full_name"],email = body["email"], address = body["address"],phone = body["phone"])
+    db.session.add(newContact)
+    db.session.commit()
+
+    response_body = {
+        "msg": "Contact added successfuly "
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/contact/<int:contactId>', methods=['GET'])
+def get_contact_id(contactId):
+    contacts = Contact.query.filter_by(id=contactId)
+    results = list(map(lambda item: item.serialize(),contacts))
+    print("resultados ",results)
+    response_body = {
+        "msg": "Hello, this is your GET /user response ",
+        "contacts": results
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/contact/<int:contactId>', methods=['DELETE'])
+def delete_contact(contactId):
+    body = request.get_json()
+    contactToDelete = Contact.query.filter_by(id=contactId).first()
+    print(contactToDelete)
+    db.session.delete(contactToDelete)
+    db.session.commit()
+    response_body = {
+        "msg": "Contact deleted"
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/contact/<int:contactId>', methods=['DELETE'])
+def update_contact(contactId):
+    body = request.get_json()
+    contactToDelete = Contact.query.filter_by(id=contactId).first()
+    print(contactToDelete)
+    db.session.delete(contactToDelete)
+    db.session.commit()
+    response_body = {
+        "msg": "Contact deleted"
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/contact/<int:contactId>', methods=['PUT'])
+def update_contact(contactId):
+    body = request.get_json()
+    contactToDelete = Contact.query.filter_by(id=contactId).first()
+    print(contactToDelete)
+    db.session.delete(contactToDelete)
+    db.session.commit()
+    response_body = {
+        "msg": "Contact deleted"
+    }
+
+    return jsonify(response_body), 200
+
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
